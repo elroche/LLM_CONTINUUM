@@ -1,0 +1,18 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Analyse de transcriptions</title>
+</head>
+<body>
+    <h1>Interface web pour l'analyse de transcriptions</h1>
+    <form action="/ask_question" method="post" enctype="multipart/form-data">
+        <label for="question">Posez une question:</label>
+        <input type="text" id="question" name="question" required>
+        <br><br>
+        <label for="files">Sélectionnez des fichiers:</label>
+        <input type="file" id="files" name="files" multiple required>
+        <br><br>
+        <input type="submit" value="Poser la question">
+    </form>
+</body>
+</html>

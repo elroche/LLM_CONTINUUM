@@ -1,0 +1,13 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Réponses</title>
+</head>
+<body>
+    <h1>Réponses à la question "{{ question }}"</h1>
+    {% for file, response in responses %}
+        <h2>Réponse pour {{ file }}</h2>
+        <p>{{ response }}</p>
+    {% endfor %}
+</body>
+</html>
