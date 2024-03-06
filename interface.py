@@ -1,21 +1,26 @@
-﻿from flask import Flask, render_template, request
+﻿from flask import Flask, render_template, request, redirect, session
 from litellm import completion
 import docx
-import textract
 
 app = Flask(__name__)
+app.secret_key = "your_secret_key"  # Clé secrète pour les sessions
+
+# Dictionnaire pour stocker les résultats d'analyse des fichiers
+file_results = {}
 
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    if 'files_analyzed' in session:
+        return render_template('index.html', show_question_form=True)
+    else:
+        return render_template('index.html', show_question_form=False)
 
 
-@app.route('/ask_question', methods=['POST'])
-def ask_question():
-    question = request.form['question']
+@app.route('/upload_files', methods=['POST'])
+def upload_files():
+    global file_results
     file_paths = request.files.getlist('files')
-    responses = []
     for file in file_paths:
         if file.filename.endswith('.txt'):
             content = file.read().decode('utf-8', 'ignore')
@@ -24,17 +29,25 @@ def ask_question():
         else:
             return render_template('error.html', message="Unsupported file format")
 
-        # Ajoute la question au début du contenu du fichier
-        content_with_question = f"{question}\n{content}"
+        # Analyse du contenu du fichier avec LLM et stockage des résultats
+        response = completion(model="ollama/mistral", messages=[{"content": content, "role": "user"}])
+        file_results[file.filename] = response
 
-        response = completion(model="ollama/mistral", messages=[
-                              {"content": content_with_question, "role": "user"}])
-        #responses.append((file.filename, response))
-        # Extrayons le contenu textuel de chaque réponse
-        response_text = response.choices[0].message.content
+    session['files_analyzed'] = True  # Marquer les fichiers comme analysés
+    return redirect('/')
 
-        responses.append((file.filename, response_text))
+
+@app.route('/ask_question', methods=['POST'])
+def ask_question():
+    global file_results
+    question = request.form['question']
+    responses = []
+    for filename, result in file_results.items():
+        # Utilisation des résultats d'analyse pour répondre à la question
+        response = completion(model="ollama/mistral", messages=[{"content": result.choices[0].text, "role": "user"}, {"content": question, "role": "user"}])
+        responses.append((filename, response.choices[0].text))
     return render_template('responses.html', question=question, responses=responses)
+
 
 
 def read_docx(file):
