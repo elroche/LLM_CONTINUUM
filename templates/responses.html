@@ -1,13 +1,19 @@
 ﻿<!DOCTYPE html>
 <html>
+
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Réponses</title>
+    <link rel="icon" href="/favicon.ico">
 </head>
+
 <body>
     <h1>Réponses à la question "{{ question }}"</h1>
     {% for file, response in responses %}
-        <h2>Réponse pour {{ file }}</h2>
-        <p>{{ response }}</p>
+    <h2>Réponse pour {{ file }}</h2>
+    <p>{{ response }}</p>
     {% endfor %}
 </body>
+
 </html>
