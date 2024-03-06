@@ -24,9 +24,16 @@ def ask_question():
         else:
             return render_template('error.html', message="Unsupported file format")
 
+        # Ajoute la question au début du contenu du fichier
+        content_with_question = f"{question}\n{content}"
+
         response = completion(model="ollama/mistral", messages=[
-                              {"content": content, "role": "user"}, {"content": question, "role": "user"}])
-        responses.append((file.filename, response))
+                              {"content": content_with_question, "role": "user"}])
+        #responses.append((file.filename, response))
+        # Extrayons le contenu textuel de chaque réponse
+        response_text = response.choices[0].message.content
+
+        responses.append((file.filename, response_text))
     return render_template('responses.html', question=question, responses=responses)
 
 
