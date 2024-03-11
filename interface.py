@@ -1,37 +1,19 @@
-﻿from flask import Flask, render_template, request
+﻿from flask import Flask, render_template, request, redirect, url_for
 from litellm import completion
 import docx
-import textract
+from langchain_community.llms import Ollama
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.embeddings import OllamaEmbeddings
+from langchain_community.vectorstores import Chroma
+from langchain.chains import RetrievalQA
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.docstore.document import Document
 
-app = Flask(__name__)
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+# Initialisation de l'instance Ollama
+ollama = Ollama(base_url='http://localhost:11434', model="llama2")
+oembed = OllamaEmbeddings(base_url="http://localhost:11434", model="llama2")
 
-@app.route('/ask_question', methods=['POST'])
-def ask_question():
-    question = request.form['question']
-    file_paths = request.files.getlist('files')
-    responses = []
-    
-    for file in file_paths:
-        if file.filename.endswith('.txt'):
-            content = file.read().decode('utf-8', 'ignore')
-        elif file.filename.endswith('.docx'):
-            content = read_docx(file)
-        else:
-            return render_template('error.html', message="Unsupported file format")
-
-        # Utiliser le modèle pour obtenir la réponse
-        response = completion(model="ollama/mistral", messages=[{"content": content, "role": "user"},{"content": question, "role": "user"}])
-
-        # Extraire la réponse textuelle
-        response_text = response.choices[0].message.content
-
-        responses.append((file.filename, response_text))
-    
-    return render_template('responses.html', question=question, responses=responses)
 
 def read_docx(file):
     doc = docx.Document(file)
@@ -40,5 +22,56 @@ def read_docx(file):
         full_text.append(para.text)
     return '\n'.join(full_text)
 
-if __name__ == '__main__':
-    app.run(debug=True)
+
+app = Flask(__name__)
+
+
+@app.route('/')
+def index():
+    return render_template('upload.html')
+
+@app.route('/upload', methods=['POST'])
+def upload():
+    global vectorstore
+    file_paths = request.files.getlist('files')
+    documents = []
+
+    for file in file_paths:
+        if file.filename.endswith('.txt'):
+            content = file.read().decode('utf-8', 'ignore')
+            documents.append(Document(page_content=content, metadata={"source": "local"}))
+        elif file.filename.endswith('.docx'):
+            content = read_docx(file)
+            documents.append(Document(page_content=content, metadata={"source": "local"}))
+        else:
+            return render_template('error.html', message="Unsupported file format")
+    
+    # Vectorisation des documents
+    text_splitter = CharacterTextSplitter(chunk_size=1500, chunk_overlap=200)
+    docs = text_splitter.split_documents(documents)
+    datastore_directory = './datastore'
+    vectorstore = Chroma.from_documents(documents=docs, embedding=oembed, persist_directory=datastore_directory)
+    #vectorstore.persist(directory=datastore_directory)
+
+    return redirect(url_for('ask_question'))
+
+@app.route('/ask_question', methods=['GET', 'POST'])
+def ask_question():
+    global vectorstore
+    if request.method == 'POST':
+        question = request.form['question']
+        
+        # Utilisation du modèle pour répondre à la question
+        qachain = RetrievalQA.from_chain_type(ollama, retriever=vectorstore.as_retriever())
+        response = qachain({"query": question})
+    
+        # Obtenir la réponse textuelle
+        response_text = response["response"]
+    
+        return render_template('responses.html', question=question, response=response)
+    
+    return render_template('ask_question.html')
+
+
+if __name__ == "__main__":
+    app.run(host='127.0.0.1', port=5002, debug=True)
