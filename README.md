@@ -1,7 +1,7 @@
 Installation python
 installsion IDE (vscode)
 installation ollama (https://ollama.com/)
- 
+
 ollama run mistral
 
 pip install virtualenv
@@ -11,5 +11,6 @@ venv\Scripts\activate
 
 pip install -r requirements.txt
 
+pip freeze > requirements.txt
 
 pip install faiss-cpu
