@@ -64,14 +64,19 @@ def ask_question():
         # Utilisation du modèle pour répondre à la question
         qachain = RetrievalQA.from_chain_type(ollama, retriever=vectorstore.as_retriever())
         response = qachain({"query": question})
+        print("response : ", response)
     
         # Obtenir la réponse textuelle
-        response_text = response["response"]
+        response_text = response["result"]
+        print("response_text : ", response_text)
     
-        return render_template('responses.html', question=question, response=response)
+        return render_template('responses.html', question=question, response=response_text)
     
     return render_template('ask_question.html')
 
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=5002, debug=True)
+
+
+
