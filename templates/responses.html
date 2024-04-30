@@ -1,0 +1,22 @@
+﻿<!-- Page de réponse à la question posée -->
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Déclaration de l'encodage des caractères -->
+    <meta charset="UTF-8">
+    <!-- Titre de la page -->
+    <title>Réponses</title>
+    <!-- Gestion du retour à la ligne dans le texte -->
+    <style>
+        p {
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <!-- Titre principal de la page -->
+    <h1>Réponses à la question "{{ question }}"</h1>
+    <!-- Affichage de la réponse à la question -->
+    <p>{{ response | safe }}</p>
+</body>
+</html>
