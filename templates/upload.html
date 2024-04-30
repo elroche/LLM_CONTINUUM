@@ -1,15 +1,22 @@
+<!-- Page de Chargement et Vectorisation de Documents -->
 <!DOCTYPE html>
 <html>
 <head>
+    <!-- Déclaration de l'encodage des caractères -->
     <meta charset="UTF-8">
+    <!-- Titre de la page -->
     <title>Chargement des Documents</title>
 </head>
 <body>
+    <!-- Titre principal de la page -->
     <h1>Chargement des Documents</h1>
+    <!-- Formulaire pour charger et vectoriser des documents -->
     <form action="/upload" method="post" enctype="multipart/form-data">
+        <!-- Champ de téléchargement de fichiers -->
         <label for="files">Sélectionnez des fichiers:</label>
         <input type="file" id="files" name="files" multiple required>
         <br><br>
+        <!-- Bouton de soumission du formulaire -->
         <input type="submit" value="Charger et Vectoriser les Documents">
     </form>
 </body>

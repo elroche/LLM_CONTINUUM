@@ -1,18 +1,26 @@
-﻿<!DOCTYPE html>
+﻿<!-- Page d'accueil -->
+<!DOCTYPE html>
 <html>
 <head>
+    <!-- Déclaration de l'encodage des caractères -->
     <meta charset="UTF-8">
+    <!-- Titre de la page -->
     <title>Analyse de transcriptions</title>
 </head>
 <body>
+    <!-- Titre principal de la page -->
     <h1>Interface web pour l'analyse de transcriptions</h1>
+    <!-- Formulaire pour poser une question et télécharger des fichiers -->
     <form action="/ask_question" method="post" enctype="multipart/form-data">
+        <!-- Champ de saisie pour la question -->
         <label for="question">Posez une question:</label>
         <input type="text" id="question" name="question" required>
         <br><br>
+        <!-- Champ de téléchargement de fichiers -->
         <label for="files">Sélectionnez des fichiers:</label>
         <input type="file" id="files" name="files" multiple required>
         <br><br>
+        <!-- Bouton de soumission du formulaire -->
         <input type="submit" value="Poser la question">
     </form>
 </body>

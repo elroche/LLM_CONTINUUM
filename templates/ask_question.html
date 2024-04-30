@@ -1,15 +1,21 @@
+<!-- Formulaire de Question -->
 <!DOCTYPE html>
 <html>
 <head>
+    <!-- Déclaration de l'encodage des caractères -->
     <meta charset="UTF-8">
+    <!-- Titre de la page -->
     <title>Poser une Question</title>
 </head>
 <body>
+    <!-- Titre principal de la page -->
     <h1>Poser une Question</h1>
+    <!-- Formulaire pour poser une question -->
     <form action="/ask_question" method="post">
         <label for="question">Posez une question:</label>
         <input type="text" id="question" name="question" required>
         <br><br>
+        <!-- Bouton de soumission du formulaire -->
         <input type="submit" value="Poser la Question">
     </form>
 </body>
